@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dev-Jefferson | Full-Stack Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#040812;
+  --surface:#0a1628;
+  --surface2:#0f1f3d;
+  --accent:#00e5ff;
+  --accent2:#7c3aed;
+  --accent3:#f0a500;
+  --text:#e8f4f8;
+  --muted:#7a8fa6;
+  --border:rgba(0,229,255,0.12);
+  --glow:rgba(0,229,255,0.15);
+  --dragon-fill:rgba(0,229,255,0.10);
+  --dragon-stroke:#00e5ff;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:none}
+
+/* CURSOR */
+#cursor{position:fixed;width:12px;height:12px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.15s ease;mix-blend-mode:screen}
+#cursor-ring{position:fixed;width:36px;height:36px;border:1.5px solid var(--accent);border-radius:50%;pointer-events:none;z-index:9998;transition:all 0.12s ease;opacity:0.5}
+
+/* CANVAS */
+#star-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* NOISE OVERLAY */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");z-index:1;pointer-events:none;opacity:0.4}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;z-index:100;padding:20px 60px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid transparent;transition:all 0.4s}
+nav.scrolled{background:rgba(4,8,18,0.95);border-color:var(--border);backdrop-filter:blur(20px)}
+.nav-logo{font-family:'Space Mono',monospace;font-size:1.1rem;color:var(--accent);letter-spacing:-0.02em}
+.nav-logo span{color:var(--text)}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--accent);transition:width 0.3s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a:hover::after{width:100%}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 60px;position:relative;z-index:2}
+.hero-eyebrow{font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--accent);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fadeUp 0.8s 0.3s forwards}
+.hero-name{font-family:'Space Mono',monospace;font-size:clamp(3rem,8vw,7rem);font-weight:700;line-height:0.95;letter-spacing:-0.04em;margin-bottom:8px;opacity:0;animation:fadeUp 0.8s 0.5s forwards}
+.hero-name .line1{display:block;color:var(--text)}
+.hero-name .line2{display:block;-webkit-text-stroke:1px var(--accent);color:transparent;position:relative}
+.hero-name .line2::after{content:'Jefferson';position:absolute;left:2px;top:2px;-webkit-text-stroke:0;color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:0.3}
+.hero-sub{font-size:1.1rem;color:var(--muted);max-width:520px;line-height:1.7;margin:28px 0 48px;opacity:0;animation:fadeUp 0.8s 0.7s forwards}
+.hero-sub strong{color:var(--text)}
+.hero-actions{display:flex;gap:20px;flex-wrap:wrap;opacity:0;animation:fadeUp 0.8s 0.9s forwards}
+.btn-primary{padding:14px 32px;background:var(--accent);color:#040812;font-weight:600;font-size:0.9rem;border:none;border-radius:4px;text-decoration:none;cursor:none;transition:all 0.3s;letter-spacing:0.03em;position:relative;overflow:hidden}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,0.2));transform:translateX(-100%);transition:transform 0.4s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,255,0.4)}
+.btn-primary:hover::before{transform:translateX(100%)}
+.btn-outline{padding:14px 32px;background:transparent;color:var(--text);font-size:0.9rem;border:1px solid var(--border);border-radius:4px;text-decoration:none;cursor:none;transition:all 0.3s;letter-spacing:0.03em}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.scroll-hint{position:absolute;bottom:40px;left:60px;display:flex;align-items:center;gap:12px;color:var(--muted);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0;animation:fadeUp 0.8s 1.2s forwards}
+.scroll-line{width:40px;height:1px;background:var(--muted)}
+
+/* STATUS BADGE */
+.status-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.2);padding:8px 16px;border-radius:100px;font-size:0.78rem;color:var(--accent);margin-bottom:32px;opacity:0;animation:fadeUp 0.8s 0.1s forwards}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,229,255,0.4)}50%{opacity:0.6;box-shadow:0 0 0 6px rgba(0,229,255,0)}}
+
+/* SECTIONS */
+section{position:relative;z-index:2;padding:120px 60px}
+.section-label{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--accent);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.section-label::before{content:'';width:30px;height:1px;background:var(--accent)}
+.section-title{font-size:clamp(2rem,4vw,3.5rem);font-weight:600;line-height:1.1;letter-spacing:-0.03em;margin-bottom:16px}
+.section-title em{font-style:normal;color:var(--accent)}
+
+/* ABOUT */
+#about{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.about-text p{color:var(--muted);line-height:1.8;margin-bottom:20px;font-size:1rem}
+.about-text p strong{color:var(--text)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.stat-card{background:var(--surface);padding:32px 24px;text-align:center}
+.stat-num{font-family:'Space Mono',monospace;font-size:2.8rem;font-weight:700;color:var(--accent);line-height:1}
+.stat-label{color:var(--muted);font-size:0.8rem;letter-spacing:0.08em;margin-top:8px;text-transform:uppercase}
+
+/* SKILLS */
+#skills{background:var(--surface)}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-top:60px}
+.skill-chip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:20px 16px;text-align:center;transition:all 0.3s;cursor:none}
+.skill-chip:hover{border-color:var(--accent);background:rgba(0,229,255,0.05);transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,229,255,0.1)}
+.skill-icon{font-size:1.8rem;margin-bottom:10px}
+.skill-name{font-size:0.82rem;color:var(--muted);font-weight:500;letter-spacing:0.04em}
+
+/* PROJECTS */
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;margin-top:60px}
+.project-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all 0.4s;cursor:none;position:relative;group:true}
+.project-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,255,0.03),transparent);opacity:0;transition:opacity 0.3s;z-index:1}
+.project-card:hover{border-color:rgba(0,229,255,0.3);transform:translateY(-6px);box-shadow:0 24px 60px rgba(0,0,0,0.4),0 0 40px rgba(0,229,255,0.06)}
+.project-card:hover::before{opacity:1}
+.project-img{width:100%;height:220px;object-fit:cover;object-position:top;display:block;transition:transform 0.5s;border-bottom:1px solid var(--border)}
+.project-card:hover .project-img{transform:scale(1.03)}
+.project-body{padding:24px;position:relative;z-index:2}
+.project-tag{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--accent);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:10px}
+.project-body h3{font-size:1.15rem;font-weight:600;margin-bottom:10px;color:var(--text)}
+.project-body p{color:var(--muted);font-size:0.88rem;line-height:1.65}
+.project-footer{display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.project-link{color:var(--accent);font-size:0.8rem;font-weight:500;text-decoration:none;letter-spacing:0.04em;display:flex;align-items:center;gap:6px;transition:gap 0.2s}
+.project-link:hover{gap:10px}
+
+/* GITHUB SECTION */
+#github{background:var(--surface)}
+.github-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:48px;text-align:center;max-width:700px;margin:60px auto 0}
+.github-avatar{width:100px;height:100px;border-radius:50%;border:3px solid var(--accent);margin:0 auto 24px;display:block;box-shadow:0 0 30px rgba(0,229,255,0.3)}
+.github-name{font-family:'Space Mono',monospace;font-size:1.4rem;color:var(--text);margin-bottom:8px}
+.github-bio{color:var(--muted);font-size:0.95rem;margin-bottom:32px;line-height:1.6}
+.github-stats{display:flex;justify-content:center;gap:48px;margin-bottom:36px}
+.gh-stat{text-align:center}
+.gh-stat-num{font-family:'Space Mono',monospace;font-size:1.6rem;color:var(--accent)}
+.gh-stat-label{color:var(--muted);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
+#repos-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:36px;text-align:left}
+.repo-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;transition:all 0.3s}
+.repo-card:hover{border-color:rgba(0,229,255,0.3);transform:translateY(-3px)}
+.repo-name{color:var(--accent);font-size:0.9rem;font-weight:600;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.repo-desc{color:var(--muted);font-size:0.78rem;line-height:1.5;margin-bottom:12px;height:38px;overflow:hidden}
+.repo-meta{display:flex;gap:12px;font-size:0.73rem;color:var(--muted)}
+.repo-lang::before{content:'⬤ ';color:var(--accent3)}
+.loading-repos{color:var(--muted);font-size:0.9rem;padding:20px;text-align:center;font-family:'Space Mono',monospace}
+
+/* SCHEDULER / WHATSAPP */
+#scheduler{position:relative}
+.whatsapp-card{max-width:700px;margin:60px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:52px 48px;text-align:center}
+.whatsapp-icon-wrap{width:72px;height:72px;border-radius:50%;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.35);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 24px}
+.whatsapp-card h3{font-size:1.4rem;font-weight:600;color:var(--text);margin-bottom:12px}
+.whatsapp-card p{color:var(--muted);font-size:0.95rem;line-height:1.7;max-width:460px;margin:0 auto 36px}
+.btn-whatsapp{display:inline-flex;align-items:center;gap:12px;padding:16px 36px;background:#25d366;color:#fff;font-weight:700;font-size:1rem;border-radius:8px;text-decoration:none;cursor:none;transition:all 0.3s;letter-spacing:0.02em;border:none}
+.btn-whatsapp:hover{background:#1ebe5a;transform:translateY(-3px);box-shadow:0 12px 40px rgba(37,211,102,0.35)}
+.whatsapp-note{margin-top:20px;color:var(--muted);font-size:0.78rem;font-family:'Space Mono',monospace;letter-spacing:0.04em}
+
+/* CONTACT */
+#contact{background:var(--surface)}
+.contact-wrapper{max-width:700px;margin:60px auto 0}
+.contact-form{display:flex;flex-direction:column;gap:20px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.field{display:flex;flex-direction:column;gap:8px}
+.field label{font-size:0.8rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;font-weight:500}
+.field input,.field textarea,.field select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:14px 18px;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.3s;cursor:none}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,0.08)}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+.field textarea{resize:vertical;min-height:120px}
+.field select option{background:var(--surface2)}
+.submit-btn{padding:16px 40px;background:var(--accent);color:#040812;border:none;border-radius:8px;font-weight:700;font-size:1rem;cursor:none;transition:all 0.3s;align-self:flex-start;letter-spacing:0.02em;position:relative;overflow:hidden}
+.submit-btn:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,229,255,0.35)}
+.submit-success{display:none;color:var(--accent);font-family:'Space Mono',monospace;font-size:0.9rem;margin-top:8px}
+
+/* FOOTER */
+footer{position:relative;z-index:2;padding:60px 60px 40px;border-top:1px solid var(--border)}
+.footer-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap}
+.footer-brand .logo{font-family:'Space Mono',monospace;font-size:1.2rem;color:var(--accent)}
+.footer-brand p{color:var(--muted);font-size:0.82rem;margin-top:8px;max-width:260px;line-height:1.6}
+.footer-links h4{font-size:0.78rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px}
+.footer-links ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:0.88rem;transition:color 0.2s}
+.footer-links a:hover{color:var(--accent)}
+.footer-bottom{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:0.8rem;flex-wrap:wrap;gap:12px}
+.footer-bottom .made-with{font-family:'Space Mono',monospace;font-size:0.73rem}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(40px);transition:all 0.8s cubic-bezier(0.16,1,0.3,1)}
+.reveal.in-view{opacity:1;transform:translateY(0)}
+
+/* GRID LINE ACCENT */
+.grid-accent{position:absolute;right:0;top:0;width:50%;height:100%;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:0.3;z-index:0}
+
+/* DRAGON SVG */
+#dragon-svg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:hidden}
+
+/* THEME INDICATOR */
+.theme-indicator{position:fixed;bottom:28px;right:28px;z-index:200;display:flex;align-items:center;gap:8px;background:rgba(4,8,18,0.75);border:1px solid var(--border);backdrop-filter:blur(12px);padding:8px 14px;border-radius:100px;font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.08em;pointer-events:none;transition:border-color 1.8s}
+.theme-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);transition:background 1s}
+
+/* MOBILE */
+@media(max-width:768px){
+  nav{padding:20px 24px}
+  .nav-links{display:none}
+  #hero,section{padding:80px 24px}
+  .hero-name{font-size:clamp(2.5rem,12vw,4rem)}
+  #about{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .footer-inner{flex-direction:column}
+  footer{padding:48px 24px 32px}
+  .footer-bottom{flex-direction:column;text-align:center}
+  #repos-grid{grid-template-columns:1fr}
+  .github-stats{gap:24px}
+  .scheduler-header,.chat-area,.scheduler-input{padding-left:24px;padding-right:24px}
+}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Star canvas -->
+<canvas id="star-canvas"></canvas>
+<!-- Dragon SVG — coordenadas de tela direto, sem viewBox -->
+<svg id="dragon-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible">
+  <defs>
+    <!-- CABEÇA -->
+    <g id="Cabeza">
+      <!-- crânio -->
+      <ellipse rx="11" ry="8" fill="var(--dragon-fill)" stroke="var(--dragon-stroke)" stroke-width="1.2"/>
+      <!-- focinho -->
+      <ellipse cx="9" cy="-2" rx="5" ry="3.5" fill="var(--dragon-fill)" stroke="var(--dragon-stroke)" stroke-width="1"/>
+      <!-- mandíbula -->
+      <path d="M2,1 Q8,6 14,2" fill="none" stroke="var(--dragon-stroke)" stroke-width="0.8" opacity="0.7"/>
+      <!-- olho -->
+      <circle cx="5" cy="-4" r="2.5" fill="white" opacity="0.95"/>
+      <circle cx="5.8" cy="-4" r="1.3" fill="var(--dragon-stroke)"/>
+      <circle cx="6.2" cy="-4.3" r="0.4" fill="white" opacity="0.8"/>
+      <!-- narina -->
+      <circle cx="13" cy="-1" r="0.9" fill="var(--dragon-stroke)" opacity="0.8"/>
+      <!-- frills topo -->
+      <line x1="-3" y1="-8" x2="-8"  y2="-18" stroke="var(--dragon-stroke)" stroke-width="1"   opacity="0.85"/>
+      <line x1="0"  y1="-8" x2="-2"  y2="-20" stroke="var(--dragon-stroke)" stroke-width="0.9" opacity="0.78"/>
+      <line x1="3"  y1="-7" x2="5"   y2="-18" stroke="var(--dragon-stroke)" stroke-width="0.8" opacity="0.7"/>
+      <line x1="6"  y1="-6" x2="10"  y2="-15" stroke="var(--dragon-stroke)" stroke-width="0.7" opacity="0.6"/>
+      <!-- membrana frill -->
+      <path d="M-3,-8 L-8,-18 L-2,-20 L0,-8" fill="var(--dragon-fill)" stroke="var(--dragon-stroke)" stroke-width="0.5" opacity="0.4"/>
+      <path d="M0,-8 L-2,-20 L5,-18 L3,-7" fill="var(--dragon-fill)" stroke="var(--dragon-stroke)" stroke-width="0.5" opacity="0.35"/>
+    </g>
+    <!-- ALETAS (asas) -->
+    <g id="Aletas">
+      <ellipse rx="8" ry="5" fill="var(--dragon-fill)" stroke="var(--dragon-stroke)" stroke-width="1.1" opacity="0.9"/>
+      <!-- asa superior -->
+      <line x1="0" y1="-5" x2="-8"  y2="-22" stroke="var(--dragon-stroke)" stroke-width="1.3" opacity="0.9"/>
+      <line x1="0" y1="-5" x2="0"   y2="-24" stroke="var(--dragon-stroke)" stroke-width="1.2" opacity="0.85"/>
+      <line x1="0" y1="-5" x2="8"   y2="-20" stroke="var(--dragon-stroke)" stroke-width="1.1" opacity="0.8"/>
+      <line x1="0" y1="-5" x2="14"  y2="-14" stroke="var(--dragon-stroke)" stroke-width="0.9" opacity="0.7"/>
+      <!-- membrana asa superior -->
+      <path d="M0,-5 L-8,-22 L0,-24 L8,-20 L14,-14 Z" fill="var(--dragon-fill)" stroke="var(--dragon-stroke)" stroke-width="0.6" opacity="0.35"/>
+      <!-- asa inferior (espelho) -->
+      <line x1="0" y1="5" x2="-8"  y2="22" stroke="var(--dragon-stroke)" stroke-width="1.3" opacity="0.9"/>
+      <line x1="0" y1="5" x2="0"   y2="24" stroke="var(--dragon-stroke)" stroke-width="1.2" opacity="0.85"/>
+      <line x1="0" y1="5" x2="8"   y2="20" stroke="var(--dragon-stroke)" stroke-width="1.1" opacity="0.8"/>
+      <line x1="0" y1="5" x2="14"  y2="14" stroke="var(--dragon-stroke)" stroke-width="0.9" opacity="0.7"/>
+      <path d="M0,5 L-8,22 L0,24 L8,20 L14,14 Z" fill="var(--dragon-fill)" stroke="var(--dragon-stroke)" stroke-width="0.6" opacity="0.35"/>
+    </g>
+    <!-- ESPINHA (segmento normal) -->
+    <g id="Espina">
+      <ellipse rx="7" ry="4.5" fill="var(--dragon-fill)" stroke="var(--dragon-stroke)" stroke-width="1" opacity="0.88"/>
+      <!-- crista superior -->
+      <line x1="-2" y1="-4.5" x2="-4" y2="-13" stroke="var(--dragon-stroke)" stroke-width="1"   opacity="0.8"/>
+      <line x1="1"  y1="-4.5" x2="1"  y2="-15" stroke="var(--dragon-stroke)" stroke-width="0.9" opacity="0.75"/>
+      <line x1="4"  y1="-4"   x2="6"  y2="-12" stroke="var(--dragon-stroke)" stroke-width="0.8" opacity="0.65"/>
+      <path d="M-2,-4.5 L-4,-13 L1,-15 L6,-12 L4,-4" fill="var(--dragon-fill)" stroke="var(--dragon-stroke)" stroke-width="0.5" opacity="0.3"/>
+    </g>
+  </defs>
+</svg>
+<!-- Theme indicator -->
+<div class="theme-indicator"><div class="theme-dot" id="tdot"></div><span id="theme-label">CYAN MODE</span></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">dev-<span>Jefferson</span></div>
+  <ul class="nav-links">
+    <li><a href="#about">Sobre</a></li>
+    <li><a href="#projects">Projetos</a></li>
+    <li><a href="#github">GitHub</a></li>
+    <li><a href="#scheduler">Agendar</a></li>
+    <li><a href="#contact">Contato</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="grid-accent"></div>
+  <div class="status-badge"><span class="status-dot"></span> Disponível para novos projetos</div>
+  <div class="hero-eyebrow">Full-Stack Developer · Matozinhos, MG</div>
+  <h1 class="hero-name">
+    <span class="line1">dev-</span>
+    <span class="line2">Jefferson</span>
+  </h1>
+  <p class="hero-sub">
+    Transformo desafios de negócios em <strong>soluções tecnológicas inteligentes</strong>. Especialista em sistemas SaaS, apps de fidelização, e automações de alto desempenho.
+  </p>
+  <div class="hero-actions">
+    <a href="#projects" class="btn-primary">Ver Projetos →</a>
+    <a href="#scheduler" class="btn-outline">Agendar Reunião</a>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>Scroll para explorar</span>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-content">
+    <div class="section-label">01 — Sobre Mim</div>
+    <h2 class="section-title">Código com <em>propósito</em> e precisão</h2>
+    <div class="about-text">
+      <p>Sou um desenvolvedor Full-Stack de <strong>Matozinhos, MG</strong>, com foco em criar sistemas que resolvem problemas reais de negócios. Não apenas escrevo código — entrego soluções completas, do backend robusto à interface que encanta o usuário.</p>
+      <p>Tenho experiência no desenvolvimento de <strong>SaaS completos para gestão de pizzarias</strong>, aplicativos de análise financeira para motoristas, sistemas de fidelização gamificados, e muito mais. Cada projeto é tratado como se fosse o meu próprio negócio.</p>
+      <p>Meu diferencial está na visão de negócio aliada à técnica: entendo o problema, projeto a solução e entrego com qualidade.</p>
+    </div>
+  </div>
+  <div class="stats-grid reveal">
+    <div class="stat-card">
+      <div class="stat-num" data-target="8">0</div>
+      <div class="stat-label">Projetos entregues</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" data-target="100">0</div>
+      <div class="stat-label">% Satisfação</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" data-target="3">0</div>
+      <div class="stat-label">Anos de experiência</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" data-target="5">0</div>
+      <div class="stat-label">Tecnologias core</div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label reveal">02 — Stack</div>
+  <h2 class="section-title reveal">Tecnologias que <em>domino</em></h2>
+  <div class="skills-grid reveal">
+    <div class="skill-chip"><div class="skill-icon">⚛️</div><div class="skill-name">React</div></div>
+    <div class="skill-chip"><div class="skill-icon">🟢</div><div class="skill-name">Node.js</div></div>
+    <div class="skill-chip"><div class="skill-icon">🗄️</div><div class="skill-name">Firebase</div></div>
+    <div class="skill-chip"><div class="skill-icon">📱</div><div class="skill-name">React Native</div></div>
+    <div class="skill-chip"><div class="skill-icon">🐘</div><div class="skill-name">PostgreSQL</div></div>
+    <div class="skill-chip"><div class="skill-icon">🟨</div><div class="skill-name">JavaScript</div></div>
+    <div class="skill-chip"><div class="skill-icon">🔷</div><div class="skill-name">TypeScript</div></div>
+    <div class="skill-chip"><div class="skill-icon">🎨</div><div class="skill-name">CSS/Tailwind</div></div>
+    <div class="skill-chip"><div class="skill-icon">🐙</div><div class="skill-name">Git/GitHub</div></div>
+    <div class="skill-chip"><div class="skill-icon">🐋</div><div class="skill-name">Docker</div></div>
+    <div class="skill-chip"><div class="skill-icon">📡</div><div class="skill-name">REST API</div></div>
+    <div class="skill-chip"><div class="skill-icon">🤖</div><div class="skill-name">AI/Claude</div></div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label reveal">03 — Portfólio</div>
+  <h2 class="section-title reveal">Projetos em <em>destaque</em></h2>
+  <div class="projects-grid reveal">
+    <div class="project-card">
+      <img class="project-img" src="https://i.ibb.co/BKSfXn9v/bhl.png" alt="Big House" onerror="this.src='https://via.placeholder.com/400x220/0a1628/00e5ff?text=Big+House'">
+      <div class="project-body">
+        <div class="project-tag">SaaS · Gestão · Pizzaria</div>
+        <h3>Big House</h3>
+        <p>Ecossistema completo de gestão para pizzarias com login seguro, portal de equipe e painel de controle em tempo real.</p>
+        <div class="project-footer">
+          <a href="https://github.com/Dev-JeffersonMF" target="_blank" class="project-link">Ver no GitHub →</a>
+          <span style="font-size:0.75rem;color:var(--muted)">Firebase · React</span>
+        </div>
+      </div>
+    </div>
+    <div class="project-card">
+      <img class="project-img" src="https://i.ibb.co/kVLcSGht/tax.png" alt="Taxímetro Pro" onerror="this.src='https://via.placeholder.com/400x220/0a1628/00e5ff?text=Taximetro+Pro'">
+      <div class="project-body">
+        <div class="project-tag">App · Financeiro · Motoristas</div>
+        <h3>Taxímetro Pro</h3>
+        <p>Análise financeira em tempo real para motoristas. Otimização de lucro, controle de km/L e relatórios detalhados.</p>
+        <div class="project-footer">
+          <a href="https://github.com/Dev-JeffersonMF" target="_blank" class="project-link">Ver no GitHub →</a>
+          <span style="font-size:0.75rem;color:var(--muted)">React Native · Node</span>
+        </div>
+      </div>
+    </div>
+    <div class="project-card">
+      <img class="project-img" src="https://i.ibb.co/F4s01B8M/fl.png" alt="Rede Fliper" onerror="this.src='https://via.placeholder.com/400x220/0a1628/00e5ff?text=Rede+Fliper'">
+      <div class="project-body">
+        <div class="project-tag">Fidelização · QR Code · Gamificação</div>
+        <h3>Rede Fliper</h3>
+        <p>Sistema de fidelização inteligente com gamificação, leitura de QR Code no caixa e resgate de prêmios integrado.</p>
+        <div class="project-footer">
+          <a href="https://github.com/Dev-JeffersonMF" target="_blank" class="project-link">Ver no GitHub →</a>
+          <span style="font-size:0.75rem;color:var(--muted)">React · Firebase</span>
+        </div>
+      </div>
+    </div>
+    <div class="project-card">
+      <img class="project-img" src="https://i.ibb.co/j9dz87WF/jl.png" alt="JL Construção" onerror="this.src='https://via.placeholder.com/400x220/0a1628/00e5ff?text=JL+Construcao'">
+      <div class="project-body">
+        <div class="project-tag">E-commerce · Varejo · Entregas</div>
+        <h3>JL Construção</h3>
+        <p>Catálogo e-commerce integrado com gestão de carrinho, checkout e controle de entregas locais.</p>
+        <div class="project-footer">
+          <a href="https://github.com/Dev-JeffersonMF" target="_blank" class="project-link">Ver no GitHub →</a>
+          <span style="font-size:0.75rem;color:var(--muted)">Node.js · PostgreSQL</span>
+        </div>
+      </div>
+    </div>
+    <div class="project-card">
+      <img class="project-img" src="https://i.ibb.co/jcJc2ch/pedeiu.png" alt="PediChegou" onerror="this.src='https://via.placeholder.com/400x220/0a1628/00e5ff?text=PediChegou'">
+      <div class="project-body">
+        <div class="project-tag">Farmácia · WhatsApp · Receituário</div>
+        <h3>PediChegou</h3>
+        <p>Solução digital para farmácias com envio de receituário fotográfico e fechamento de pedidos via WhatsApp.</p>
+        <div class="project-footer">
+          <a href="https://github.com/Dev-JeffersonMF" target="_blank" class="project-link">Ver no GitHub →</a>
+          <span style="font-size:0.75rem;color:var(--muted)">React · WhatsApp API</span>
+        </div>
+      </div>
+    </div>
+    <div class="project-card">
+      <img class="project-img" src="https://i.ibb.co/gLqvnsqz/oli.png" alt="Parafuso Oliveira" onerror="this.src='https://via.placeholder.com/400x220/0a1628/00e5ff?text=Parafuso+Oliveira'">
+      <div class="project-body">
+        <div class="project-tag">Pontuação · Corporativo · NF</div>
+        <h3>Parafuso Oliveira</h3>
+        <p>Sistema de acúmulo de pontos corporativos integrado ao portal web e nota fiscal para fidelização B2B.</p>
+        <div class="project-footer">
+          <a href="https://github.com/Dev-JeffersonMF" target="_blank" class="project-link">Ver no GitHub →</a>
+          <span style="font-size:0.75rem;color:var(--muted)">Firebase · React</span>
+        </div>
+      </div>
+    </div>
+    <div class="project-card" style="grid-column:span 1">
+      <div class="project-img-slider" style="position:relative;width:100%;height:220px;overflow:hidden;border-bottom:1px solid var(--border)">
+        <img class="project-img slide-img active-slide" src="https://i.ibb.co/tMLC7LPF/deia-pc.png" alt="Deia Presentes" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;transition:opacity 0.5s">
+        <img class="project-img slide-img" src="https://i.ibb.co/Lw8FsSx/paineldeia.png" alt="Deia Painel" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;opacity:0;transition:opacity 0.5s">
+        <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5">
+          <div class="slide-dot active-dot" onclick="setSlide(this,0)" style="width:6px;height:6px;border-radius:50%;background:var(--accent);cursor:pointer;opacity:1;transition:opacity 0.3s"></div>
+          <div class="slide-dot" onclick="setSlide(this,1)" style="width:6px;height:6px;border-radius:50%;background:var(--accent);cursor:pointer;opacity:0.35;transition:opacity 0.3s"></div>
+        </div>
+      </div>
+      <div class="project-body">
+        <div class="project-tag">Cosméticos · E-commerce · Checkout</div>
+        <h3>Deia Presentes</h3>
+        <p>Interface premium para pedidos de cosméticos com painel de gestão e checkout rápido integrado.</p>
+        <div class="project-footer">
+          <a href="https://github.com/Dev-JeffersonMF" target="_blank" class="project-link">Ver no GitHub →</a>
+          <span style="font-size:0.75rem;color:var(--muted)">React · Firebase</span>
+        </div>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- GITHUB -->
+<section id="github">
+  <div class="section-label reveal">04 — Open Source</div>
+  <h2 class="section-title reveal">Meu <em>GitHub</em></h2>
+  <div class="github-card reveal">
+    <img id="gh-avatar" class="github-avatar" src="https://github.com/Dev-JeffersonMF.png" alt="Jefferson GitHub" onerror="this.src='https://via.placeholder.com/100/0a1628/00e5ff?text=JM'">
+    <h3 class="github-name" id="gh-name">Dev-JeffersonMF</h3>
+    <p class="github-bio" id="gh-bio">Carregando perfil...</p>
+    <div class="github-stats">
+      <div class="gh-stat"><div class="gh-stat-num" id="gh-repos">—</div><div class="gh-stat-label">Repositórios</div></div>
+      <div class="gh-stat"><div class="gh-stat-num" id="gh-followers">—</div><div class="gh-stat-label">Seguidores</div></div>
+      <div class="gh-stat"><div class="gh-stat-num" id="gh-following">—</div><div class="gh-stat-label">Seguindo</div></div>
+    </div>
+    <a href="https://github.com/Dev-JeffersonMF" target="_blank" class="btn-primary" style="display:inline-block;margin-bottom:32px">Ver Perfil Completo →</a>
+    <div id="repos-grid"><div class="loading-repos">Carregando repositórios...</div></div>
+  </div>
+</section>
+
+<!-- SCHEDULER WHATSAPP -->
+<section id="scheduler">
+  <div class="section-label reveal">05 — Agendamento</div>
+  <h2 class="section-title reveal">Agende uma <em>reunião</em> comigo</h2>
+  <p style="color:var(--muted);margin-top:-8px;margin-bottom:0;max-width:500px" class="reveal">Fale diretamente comigo pelo WhatsApp. Respondo rápido e a gente encontra o melhor horário para conversar sobre o seu projeto.</p>
+  <div class="whatsapp-card reveal">
+    <div class="whatsapp-icon-wrap">💬</div>
+    <h3>Fale comigo no WhatsApp</h3>
+    <p>Clique no botão abaixo para iniciar uma conversa. Me conte sobre seu projeto e combinamos um horário — seg a sex, das 9h às 18h (horário de Brasília).</p>
+    <!-- ⚠️ TROQUE 5531999999999 pelo seu número real com DDI+DDD (ex: 5531912345678) -->
+    <a href="https://wa.me/5531984756800?text=Ol%C3%A1%20Jefferson!%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20agendar%20uma%20reuni%C3%A3o%20para%20conversar%20sobre%20meu%20projeto." target="_blank" class="btn-whatsapp">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Agendar pelo WhatsApp
+    </a>
+    <p class="whatsapp-note">⏱ Resposta em até 2h nos dias úteis</p>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label reveal">06 — Contato</div>
+  <h2 class="section-title reveal">Vamos <em>conversar</em></h2>
+  <div class="contact-wrapper reveal">
+    <div class="contact-form">
+      <div class="form-row">
+        <div class="field">
+          <label>Nome completo</label>
+          <input type="text" id="c-name" placeholder="Seu nome">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="c-email" placeholder="seu@email.com">
+        </div>
+      </div>
+      <div class="field">
+        <label>Assunto</label>
+        <select id="c-subject">
+          <option value="">Selecione...</option>
+          <option>Desenvolvimento de Sistema</option>
+          <option>App Mobile</option>
+          <option>E-commerce</option>
+          <option>Automação</option>
+          <option>Consultoria</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Mensagem</label>
+        <textarea id="c-message" placeholder="Conte sobre seu projeto..."></textarea>
+      </div>
+      <button class="submit-btn" onclick="submitContact()">Enviar Mensagem →</button>
+      <div class="submit-success" id="submit-success">✓ Mensagem enviada! Entrarei em contato em breve.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">dev-Jefferson</div>
+      <p>Desenvolvendo soluções inteligentes de Matozinhos, MG para o mundo.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Navegação</h4>
+      <ul>
+        <li><a href="#about">Sobre</a></li>
+        <li><a href="#projects">Projetos</a></li>
+        <li><a href="#scheduler">Agendar</a></li>
+        <li><a href="#contact">Contato</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Contato</h4>
+      <ul>
+        <li><a href="mailto:jefferson.macedo.fernandes@gmail.com">jefferson.macedo.fernandes@gmail.com</a></li>
+        <li><a href="https://github.com/Dev-JeffersonMF" target="_blank">GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 dev-Jefferson. Todos os direitos reservados.</span>
+    <span class="made-with">built with ♥ &amp; Claude AI</span>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+let cx=0,cy=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY;cursor.style.left=cx-6+'px';cursor.style.top=cy-6+'px'});
+function animRing(){rx+=(cx-rx)*0.12;ry+=(cy-ry)*0.12;ring.style.left=rx-18+'px';ring.style.top=ry-18+'px';requestAnimationFrame(animRing)}animRing();
+document.querySelectorAll('a,button,.chip,.skill-chip,.project-card').forEach(el=>{el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2)';ring.style.transform='scale(1.5)';ring.style.opacity='0.3'});el.addEventListener('mouseleave',()=>{cursor.style.transform='scale(1)';ring.style.transform='scale(1)';ring.style.opacity='0.5'})});
+
+// STARS
+const canvas=document.getElementById('star-canvas'),ctx=canvas.getContext('2d');
+let stars=[];
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+function initStars(){stars=[];for(let i=0;i<180;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.2+0.2,a:Math.random(),da:Math.random()*0.003+0.001,vx:(Math.random()-0.5)*0.08,vy:(Math.random()-0.5)*0.08})}
+function drawStars(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;s.x+=s.vx;s.y+=s.vy;if(s.x<0)s.x=canvas.width;if(s.x>canvas.width)s.x=0;if(s.y<0)s.y=canvas.height;if(s.y>canvas.height)s.y=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(0,229,255,${s.a*0.7})`;ctx.fill()});}
+resize();initStars();drawStars();
+window.addEventListener('resize',()=>{resize();initStars()});
+
+// NAV scroll
+window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('scrolled',scrollY>60)});
+
+// REVEAL
+const observer=new IntersectionObserver(els=>els.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in-view')}),{threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// COUNTER
+function animCount(el,target){let current=0;const step=target/60;const t=setInterval(()=>{current+=step;if(current>=target){current=target;clearInterval(t)}el.textContent=Math.floor(current)+(el.dataset.target==='100'?'%':'+'+'')},20)}
+const cObs=new IntersectionObserver(els=>els.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('[data-target]').forEach(el=>animCount(el,+el.dataset.target));cObs.disconnect()}}),{threshold:0.5});
+document.querySelector('.stats-grid')&&cObs.observe(document.querySelector('.stats-grid'));
+
+// GITHUB API
+async function loadGitHub(){try{const r=await fetch('https://api.github.com/users/Dev-JeffersonMF');const d=await r.json();document.getElementById('gh-name').textContent=d.name||d.login;document.getElementById('gh-bio').textContent=d.bio||'Desenvolvedor Full-Stack apaixonado por criar soluções que fazem diferença.';document.getElementById('gh-repos').textContent=d.public_repos;document.getElementById('gh-followers').textContent=d.followers;document.getElementById('gh-following').textContent=d.following;const rr=await fetch('https://api.github.com/users/Dev-JeffersonMF/repos?sort=updated&per_page=6');const repos=await rr.json();const grid=document.getElementById('repos-grid');grid.innerHTML='';repos.slice(0,6).forEach(repo=>{grid.innerHTML+=`<div class="repo-card"><div class="repo-name">${repo.name}</div><div class="repo-desc">${repo.description||'Sem descrição.'}</div><div class="repo-meta"><span class="repo-lang">${repo.language||'—'}</span><span>⭐ ${repo.stargazers_count}</span><span>🍴 ${repo.forks_count}</span></div></div>`})}catch(e){document.getElementById('gh-bio').textContent='Acesse o GitHub para ver os projetos completos.';document.getElementById('repos-grid').innerHTML='<div class="loading-repos">Não foi possível carregar. Visite o GitHub diretamente.</div>'}}
+loadGitHub();
+
+// CONTACT FORM
+function submitContact(){
+  const name=document.getElementById('c-name').value;
+  const email=document.getElementById('c-email').value;
+  const msg=document.getElementById('c-message').value;
+  if(!name||!email||!msg){alert('Por favor, preencha todos os campos.');return;}
+  const mailto=`mailto:jefferson.macedo.fernandes@gmail.com?subject=Contato via Portfólio - ${document.getElementById('c-subject').value}&body=Nome: ${name}%0AEmail: ${email}%0A%0AMensagem:%0A${msg}`;
+  window.open(mailto);
+  document.getElementById('submit-success').style.display='block';
+}
+
+// IMAGE SLIDER (Deia)
+function setSlide(dot,idx){
+  document.querySelectorAll('.slide-img').forEach((img,i)=>{img.style.opacity=i===idx?'1':'0'});
+  document.querySelectorAll('.slide-dot').forEach(d=>d.style.opacity='0.35');
+  dot.style.opacity='1';
+}
+// Auto-advance slider
+let slideIdx=0;
+setInterval(()=>{
+  slideIdx=(slideIdx+1)%2;
+  const dots=document.querySelectorAll('.slide-dot');
+  if(dots.length)setSlide(dots[slideIdx],slideIdx);
+},3200);
+
+// ============================================================
+// DRAGON + THEME SYSTEM
+// ============================================================
+const DRAGON_THEMES=[
+  {name:'CYAN MODE',   accent:'#00e5ff', accent2:'#7c3aed', bg:'#040812', surface:'#0a1628', surface2:'#0f1f3d', border:'rgba(0,229,255,0.12)',   dragonFill:'rgba(0,229,255,0.10)',  dragonStroke:'#00e5ff', starColor:'0,229,255'},
+  {name:'VIOLET MODE', accent:'#a855f7', accent2:'#00e5ff', bg:'#06030f', surface:'#0e0720', surface2:'#150b32', border:'rgba(168,85,247,0.14)',  dragonFill:'rgba(168,85,247,0.10)', dragonStroke:'#a855f7', starColor:'168,85,247'},
+  {name:'EMBER MODE',  accent:'#f97316', accent2:'#a855f7', bg:'#0d0600', surface:'#1a0d03', surface2:'#271306', border:'rgba(249,115,22,0.14)',  dragonFill:'rgba(249,115,22,0.10)', dragonStroke:'#f97316', starColor:'249,115,22'},
+];
+let currentTheme=0;
+
+function applyTheme(t,animate=true){
+  const dur=animate?'1.8s':'0s';
+  const root=document.documentElement;
+  root.style.setProperty('--accent',t.accent);
+  root.style.setProperty('--accent2',t.accent2);
+  root.style.setProperty('--bg',t.bg);
+  root.style.setProperty('--surface',t.surface);
+  root.style.setProperty('--surface2',t.surface2);
+  root.style.setProperty('--border',t.border);
+  // Dragon SVG CSS vars
+  root.style.setProperty('--dragon-fill',t.dragonFill);
+  root.style.setProperty('--dragon-stroke',t.dragonStroke);
+  document.body.style.transition=`background-color ${dur} ease`;
+  document.body.style.backgroundColor=t.bg;
+  document.getElementById('tdot').style.background=t.accent;
+  document.getElementById('theme-label').textContent=t.name;
+  currentStarColor=t.starColor;
+}
+
+let currentStarColor='0,229,255';
+applyTheme(DRAGON_THEMES[0],false);
+
+function nextTheme(){
+  currentTheme=(currentTheme+1)%DRAGON_THEMES.length;
+  applyTheme(DRAGON_THEMES[currentTheme]);
+}
+setInterval(nextTheme,8000);
+
+// Patch star drawing to use dynamic color
+function drawStarsDynamic(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;
+    s.x+=s.vx;s.y+=s.vy;
+    if(s.x<0)s.x=canvas.width;if(s.x>canvas.width)s.x=0;
+    if(s.y<0)s.y=canvas.height;if(s.y>canvas.height)s.y=0;
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${currentStarColor},${s.a*0.7})`;ctx.fill();
+  });
+  requestAnimationFrame(drawStarsDynamic);
+}
+// Stop old loop, start new dynamic one
+drawStarsDynamic();
+
+// ============================================================
+// DRAGON SVG ENGINE (adapted from original script.js)
+// ============================================================
+(function(){
+  "use strict";
+  const svgEl=document.getElementById('dragon-svg');
+  const xmlns="http://www.w3.org/2000/svg";
+  const xlinkns="http://www.w3.org/1999/xlink";
+
+  const VBW=300,VBH=300,VBX=-150,VBY=-150;
+  const toSvg=(px,py)=>({x:(px/window.innerWidth)*VBW+VBX,y:(py/window.innerHeight)*VBH+VBY});
+
+  const N=30;
+  const elems=[];
+  const initC=toSvg(window.innerWidth/2,window.innerHeight/2);
+  for(let i=0;i<N;i++) elems[i]={use:null,x:initC.x,y:initC.y};
+
+  const pointer={x:initC.x,y:initC.y};
+  const radm=Math.min(VBW,VBH)/6-20;
+  let frm=Math.random(),rad=0;
+
+  const prepend=(id,i)=>{
+    const use=document.createElementNS(xmlns,"use");
+    elems[i].use=use;
+    use.setAttributeNS(xlinkns,"xlink:href","#"+id);
+    svgEl.prepend(use);
+  };
+
+  for(let i=1;i<N;i++){
+    if(i===1) prepend("Cabeza",i);
+    else if(i===6||i===13) prepend("Aletas",i);
+    else prepend("Espina",i);
+  }
+
+  document.addEventListener("pointermove",e=>{
+    const c=toSvg(e.clientX,e.clientY);
+    pointer.x=c.x;pointer.y=c.y;rad=0;
+  },false);
+
+  const run=()=>{
+    requestAnimationFrame(run);
+    let e=elems[0];
+    const ax=(Math.cos(3*frm)*rad*VBW)/VBH;
+    const ay=(Math.sin(4*frm)*rad*VBH)/VBW;
+    e.x+=(ax+pointer.x-e.x)/10;
+    e.y+=(ay+pointer.y-e.y)/10;
+    for(let i=1;i<N;i++){
+      let ei=elems[i],ep=elems[i-1];
+      const a=Math.atan2(ei.y-ep.y,ei.x-ep.x);
+      ei.x+=(ep.x-ei.x+(Math.cos(a)*(100-i))/22)/4;
+      ei.y+=(ep.y-ei.y+(Math.sin(a)*(100-i))/22)/4;
+      // SCALE REDUZIDO: 0.38 base (era ~0.54) para dragão menor
+      const s=((162+4*(1-i))/300)*0.38;
+      if(ei.use){
+        ei.use.setAttributeNS(null,"transform",
+          `translate(${(ep.x+ei.x)/2},${(ep.y+ei.y)/2}) rotate(${(180/Math.PI)*a}) scale(${s},${s})`
+        );
+      }
+    }
+    if(rad<radm) rad++;
+    frm+=0.003;
+    if(rad>60){
+      pointer.x+=(0-pointer.x)*0.05;
+      pointer.y+=(0-pointer.y)*0.05;
+    }
+  };
+  run();
+})();
+</script>
+</body>
+</html>
