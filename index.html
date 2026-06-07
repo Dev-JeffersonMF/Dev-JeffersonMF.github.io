@@ -197,6 +197,15 @@ footer{position:relative;z-index:2;padding:60px 60px 40px;border-top:1px solid v
   .github-stats{gap:24px}
   .scheduler-header,.chat-area,.scheduler-input{padding-left:24px;padding-right:24px}
 }
+
+/* MODAL/LIGHTBOX */
+.modal{display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.9);animation:fadeIn 0.3s}
+.modal.show{display:flex;align-items:center;justify-content:center}
+.modal-content{position:relative;max-width:90%;max-height:90vh;display:flex;align-items:center;justify-content:center}
+.modal-content img{max-width:100%;max-height:85vh;object-fit:contain;border-radius:8px;box-shadow:0 0 50px rgba(0,229,255,0.3)}
+.modal-close{position:absolute;top:20px;right:30px;color:var(--accent);font-size:40px;font-weight:bold;cursor:pointer;z-index:10000;transition:transform 0.2s;background:rgba(0,0,0,0.5);width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1}
+.modal-close:hover{transform:scale(1.2)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
@@ -455,7 +464,7 @@ footer{position:relative;z-index:2;padding:60px 60px 40px;border-top:1px solid v
     </div>
 
     <div class="project-card">
-      <img class="project-img" src="Peixoto.png" alt="Peixoto Soluções Elétricas">
+      <img class="project-img clickable-img" src="Peixoto.png" alt="Peixoto Soluções Elétricas" onclick="openModal('Peixoto.png','Peixoto Soluções Elétricas')" style="cursor:pointer">
       <div class="project-body">
         <div class="project-tag">Soluções Elétricas · Automação Industrial</div>
         <h3>Peixoto Soluções Elétricas</h3>
@@ -538,7 +547,43 @@ footer{position:relative;z-index:2;padding:60px 60px 40px;border-top:1px solid v
   </div>
 </footer>
 
+<!-- MODAL LIGHTBOX -->
+<div id="imageModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close" onclick="closeModal()">&times;</span>
+    <img id="modalImage" src="" alt="">
+  </div>
+</div>
+
 <script>
+// MODAL FUNCTIONS
+function openModal(imageSrc,altText){
+  const modal=document.getElementById('imageModal');
+  const modalImg=document.getElementById('modalImage');
+  modalImg.src=imageSrc;
+  modalImg.alt=altText;
+  modal.classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  const modal=document.getElementById('imageModal');
+  modal.classList.remove('show');
+  document.body.style.overflow='auto';
+}
+// Fechar modal ao clicar fora da imagem
+document.addEventListener('DOMContentLoaded',()=>{
+  const modal=document.getElementById('imageModal');
+  if(modal){
+    modal.addEventListener('click',function(e){
+      if(e.target===modal){closeModal()}
+    });
+  }
+  // Fechar com ESC
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){closeModal()}
+  });
+});
+
 // CURSOR
 const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
 let cx=0,cy=0,rx=0,ry=0;
