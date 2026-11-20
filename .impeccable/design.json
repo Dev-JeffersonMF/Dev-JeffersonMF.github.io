@@ -1,0 +1,18 @@
+{
+  "world": "gallery-wall",
+  "mode": "experience",
+  "palette": {
+    "wall": "#16120f",
+    "wall-2": "#1d1814",
+    "mat": "#efe9dd",
+    "ink": "#f3efe6",
+    "muted": "#b8ad9c",
+    "brass": "#c8a35b"
+  },
+  "type": {
+    "body": "system sans stack",
+    "display": "system serif stack"
+  },
+  "motion": "single authored light-up per frame on viewport entry",
+  "seed": "3e9f9c7d667a33ca"
+}
