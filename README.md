@@ -6,9 +6,20 @@ https://dev-jeffersonmf.github.io/
 ## Estrutura
 
 - `index.html` — página completa (HTML, CSS e JS inline, sem dependências externas).
-- `nexo-icon.png` — ícone do Nexo redimensionado para 420 px.
 - `img/` — capturas dos projetos, redimensionadas e otimizadas.
-- `PRODUCT.md`, `DESIGN.md`, `.impeccable/` — contexto de produto, decisões visuais e contrato da superfície.
+- `PRODUCT.md` — contexto de produto (fatos preservados).
+- `DESIGN.md` — decisões visuais do mundo "portal cinematográfico".
+- `.impeccable/` — contrato da superfície e capturas de revisão.
+
+## O que mudou na v2
+
+- Redesign completo: de parede de galeria para **portal cinematográfico** inspirado na gramática do League of Legends (luz, escala e tempo — sem arte ou marca copiada).
+- Hero com 5 camadas de parallax, partículas douradas, grão e vinheta.
+- Título em serif dourado com relevo, CTA ciano e botão de agendamento.
+- Trabalhos como "missões concluídas" em molduras angulares com varredura de luz.
+- **Removidos os links de aplicativos/repositórios dos projetos**: a página apenas apresenta o trabalho e o autor.
+- Loader de abertura com barra dourada e animações em cascata.
+- Totalmente responsivo e com `prefers-reduced-motion`.
 
 ## Rodar localmente
 
@@ -22,12 +33,8 @@ Abra `http://localhost:8000`.
 
 ```bash
 git add -A
-git commit -m "Redesign: galeria de trabalhos e projeto Nexo"
+git commit -m "Redesign: portal cinematográfico"
 git push
 ```
 
 O GitHub Pages publica a partir da branch `main`.
-
-## Projeto Nexo
-
-O card do Nexo usa o link público: https://github.com/Dev-JeffersonMF/nexo-app

@@ -1,315 +1,468 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>dev-Jefferson — sistemas que resolvem negócio</title>
-  <meta name="description" content="Portfólio de Jefferson Macedo Fernandes: sistemas SaaS, apps de fidelização, automações e o assistente Nexo.">
-  <meta name="theme-color" content="#16120f">
-  <link rel="preload" as="image" href="nexo-icon.png">
-  <style>
-    :root{
-      --wall:#16120f;
-      --wall-2:#1d1814;
-      --mat:#efe9dd;
-      --mat-ink:#2a241d;
-      --ink:#f3efe6;
-      --muted:#b8ad9c;
-      --brass:#c8a35b;
-      --line:rgba(243,239,230,.16);
-      --shadow:0 22px 55px -18px rgba(0,0,0,.72);
-      --ease:cubic-bezier(.16,1,.3,1);
-      --face:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      --serif:ui-serif,Georgia,"Times New Roman",serif;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;background:var(--wall);color:var(--ink);font-family:var(--face);
-      font-size:clamp(1rem,.96rem + .18vw,1.1rem);line-height:1.65;
-      -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-    }
-    ::selection{background:var(--brass);color:var(--wall)}
-    :focus-visible{outline:2px solid var(--brass);outline-offset:4px;border-radius:2px}
-    ::-webkit-scrollbar{width:10px}
-    ::-webkit-scrollbar-track{background:var(--wall)}
-    ::-webkit-scrollbar-thumb{background:#4a4034;border-radius:10px;border:2px solid var(--wall)}
-    img{max-width:100%;display:block}
-    a{color:inherit}
-    .wrap{width:min(1180px,92vw);margin-inline:auto}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dev-Jefferson — sistemas que resolvem negócio</title>
+<meta name="description" content="Portfólio de Jefferson Macedo Fernandes: sistemas SaaS, apps de fidelização, automações e o assistente Nexo.">
+<meta name="theme-color" content="#0a0d14">
+<link rel="preload" as="image" href="nexo-icon.png">
+<style>
+  :root{
+    --void:#0a0d14;
+    --void-2:#0e1420;
+    --panel:#121a28;
+    --gold:#d4af37;
+    --gold-deep:#8a6a1c;
+    --cyan:#39c5e8;
+    --mist:#8e9aab;
+    --ink:#f2f4f7;
+    --muted:#9aa6b8;
+    --line:rgba(212,175,55,.22);
+    --line-soft:rgba(255,255,255,.08);
+    --shadow:0 28px 70px -24px rgba(0,0,0,.9);
+    --ease:cubic-bezier(.16,1,.3,1);
+    --face:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --display:ui-serif,Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--void);color:var(--ink);font-family:var(--face);
+    font-size:clamp(1rem,.96rem + .18vw,1.1rem);line-height:1.65;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;
+  }
+  ::selection{background:var(--gold);color:var(--void)}
+  :focus-visible{outline:2px solid var(--cyan);outline-offset:4px;border-radius:2px}
+  ::-webkit-scrollbar{width:10px}
+  ::-webkit-scrollbar-track{background:var(--void)}
+  ::-webkit-scrollbar-thumb{background:#26303f;border-radius:10px;border:2px solid var(--void)}
+  img{max-width:100%;display:block}
+  a{color:inherit;text-decoration:none}
+  .wrap{width:min(1240px,92vw);margin-inline:auto;position:relative}
 
-    .topbar{
-      display:flex;align-items:center;justify-content:space-between;gap:1rem;
-      padding:1.4rem 0;border-bottom:1px solid var(--line);
-    }
-    .brand{font-weight:650;letter-spacing:-.02em;text-decoration:none;font-size:1.02rem}
-    .brand span{color:var(--brass)}
-    nav{display:flex;gap:clamp(.9rem,2.4vw,2rem);flex-wrap:wrap}
-    nav a{color:var(--muted);text-decoration:none;font-size:.92rem;transition:color .25s var(--ease)}
-    nav a:hover{color:var(--brass)}
+  /* ── loader ───────────────────────────────────────────────────────── */
+  #loader{
+    position:fixed;inset:0;z-index:9999;background:var(--void);
+    display:grid;place-items:center;transition:opacity .8s var(--ease),visibility .8s;
+  }
+  #loader.done{opacity:0;visibility:hidden}
+  .loader-inner{width:min(280px,70vw);text-align:center}
+  .loader-mark{
+    font-family:var(--display);font-size:clamp(2rem,6vw,3rem);color:var(--gold);
+    text-shadow:0 1px 0 var(--gold-deep),0 4px 20px rgba(0,0,0,.8);
+    letter-spacing:-.04em;
+  }
+  .loader-bar{margin-top:1.4rem;height:2px;background:rgba(255,255,255,.1);overflow:hidden}
+  .loader-bar i{display:block;height:100%;width:0;background:var(--gold);box-shadow:0 0 14px var(--gold);animation:load 1.35s var(--ease) forwards}
+  @keyframes load{to{width:100%}}
+  .loader-sub{margin-top:.8rem;font-size:.68rem;letter-spacing:.28em;color:var(--mist);text-transform:uppercase}
 
-    .hero{
-      display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
-      gap:clamp(2rem,5vw,5rem);align-items:center;padding:clamp(3.5rem,8vw,7rem) 0;
-    }
-    .hero h1{
-      font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,6vw,5.2rem);
-      line-height:1.02;letter-spacing:-.04em;margin:0 0 1.4rem;text-wrap:balance;
-    }
-    .hero h1 em{font-style:normal;color:var(--brass)}
-    .hero p{color:var(--muted);max-width:46ch;margin:0 0 2rem}
-    .actions{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
-    .cta{
-      display:inline-flex;align-items:center;gap:.6rem;padding:.85rem 1.3rem;
-      background:var(--brass);color:var(--wall);border:1px solid var(--brass);
-      text-decoration:none;font-weight:650;border-radius:2px;
-      box-shadow:0 12px 28px -18px rgba(0,0,0,.8);
-      transition:transform .35s var(--ease),box-shadow .35s var(--ease);
-    }
-    .cta:hover{transform:translateY(-2px);box-shadow:0 18px 34px -18px rgba(0,0,0,.85)}
-    .quiet{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;transition:color .25s var(--ease)}
-    .quiet:hover{color:var(--brass)}
+  /* ── topbar ───────────────────────────────────────────────────────── */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    background:rgba(8,11,17,.88);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;height:66px}
+  .brand{font-family:var(--display);font-size:1.05rem;letter-spacing:-.02em;color:var(--ink)}
+  .brand b{color:var(--gold);font-weight:400}
+  nav{display:flex;gap:clamp(1.2rem,3vw,2.6rem);align-items:center}
+  nav a{
+    color:var(--muted);font-size:.72rem;font-weight:650;letter-spacing:.16em;text-transform:uppercase;
+    transition:color .3s var(--ease);position:relative;
+  }
+  nav a::after{content:"";position:absolute;left:0;right:100%;bottom:-6px;height:1px;background:var(--gold);transition:right .35s var(--ease)}
+  nav a:hover{color:var(--ink)}
+  nav a:hover::after{right:0}
+  .nav-cta{
+    background:var(--cyan);color:#04222c;border-radius:999px;
+    padding:.62rem 1.15rem;font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+    box-shadow:0 8px 26px -12px var(--cyan);transition:transform .35s var(--ease),box-shadow .35s var(--ease);
+  }
+  .nav-cta:hover{transform:translateY(-2px);box-shadow:0 14px 30px -12px var(--cyan)}
 
-    .work{
-      margin:0;background:var(--mat);padding:clamp(.9rem,2vw,1.5rem);
-      box-shadow:var(--shadow);
-      color:var(--mat-ink);position:relative;
-      transition:box-shadow .8s var(--ease),transform .8s var(--ease);
-    }
-    .work::after{
-      content:"";position:absolute;inset:clamp(.9rem,2vw,1.5rem);pointer-events:none;
-      border:1px solid rgba(42,36,29,.22);
-    }
-    .work.lit{box-shadow:0 28px 64px -20px rgba(0,0,0,.8)}
-    .work.lit .frame{background:#fffdf7}
-    .work:hover{transform:translateY(-4px)}
-    .work--feature{padding:clamp(1.1rem,2.6vw,2rem)}
-    .frame{background:#fffdf7;border:1px solid rgba(42,36,29,.28);display:grid;place-items:center;overflow:hidden}
-    .frame img{width:100%;height:100%;object-fit:contain}
-    .frame--icon{aspect-ratio:1/1;max-width:330px;margin-inline:auto;background:#fffdf7}
-    .frame--icon img{width:78%;height:78%}
-    .plaque{padding-top:1rem;display:grid;gap:.35rem}
-    .plaque h2,.plaque h3{font-family:var(--serif);font-size:clamp(1.25rem,2.2vw,1.75rem);font-weight:400;margin:0;letter-spacing:-.02em}
-    .plaque p{margin:0;font-size:.92rem;line-height:1.55;color:#50483d}
-    .tags{font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:#6f6455}
-    .plaque a{justify-self:start;color:#7a5a1f;font-weight:650;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:1px}
-    .plaque a:hover{color:#3d2f16}
+  /* ── hero ─────────────────────────────────────────────────────────── */
+  .hero{position:relative;min-height:100svh;display:grid;place-items:center;overflow:hidden;padding-top:66px}
+  .scene{position:absolute;inset:0;pointer-events:none}
+  .scene .layer{position:absolute;inset:-6% -2%;will-change:transform}
+  .sky{background:
+    radial-gradient(ellipse 70% 55% at 50% 42%,rgba(142,154,171,.34),transparent 72%),
+    radial-gradient(ellipse 45% 40% at 20% 70%,rgba(57,197,232,.09),transparent 70%),
+    linear-gradient(180deg,#0a0d14 0%,#141d2b 46%,#0a0d14 100%)}
+  .mist{background:
+    radial-gradient(ellipse 60% 24% at 50% 58%,rgba(200,210,220,.16),transparent 70%);
+    filter:blur(18px)}
+  .ridge{width:100%;height:100%}
+  .ridge path{fill:#0a0d14}
+  .ridge--far path{fill:#121a28;opacity:.9}
+  .figures{opacity:.95}
+  .figures svg{position:absolute;bottom:0;height:78%;width:auto;filter:drop-shadow(0 20px 30px rgba(0,0,0,.9))}
+  .fig-left{left:-2%}
+  .fig-right{right:-2%;transform:scaleX(-1)}
+  .grain{
+    position:absolute;inset:0;opacity:.16;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  }
+  .vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(4,6,10,.86) 100%)}
+  .motes{position:absolute;inset:0}
+  .mote{position:absolute;width:2px;height:2px;background:var(--gold);border-radius:50%;box-shadow:0 0 8px var(--gold);opacity:.5;animation:drift 9s ease-in-out infinite alternate}
+  @keyframes drift{to{transform:translate3d(18px,-26px,0);opacity:.9}}
 
-    .section{
-      border-top:1px solid var(--line);
-      padding-top:64px;
-      padding-bottom:64px;
-    }
-    .section > :first-child{margin-top:0}
-    .section h2{
-      font-family:var(--serif);font-weight:400;font-size:clamp(2rem,4.2vw,3.4rem);
-      line-height:1.1;letter-spacing:-.035em;margin:0 0 1.6rem;text-wrap:balance;
-    }
-    .prose{max-width:68ch;color:var(--muted);font-size:1.05rem}
-    .prose strong{color:var(--ink);font-weight:600}
-    .stack{margin-top:2rem;display:flex;flex-wrap:wrap;gap:.5rem .9rem;padding:0;list-style:none;color:var(--muted);font-size:.92rem}
-    .stack li::after{content:"·";color:var(--brass);margin-left:.9rem}
-    .stack li:last-child::after{content:""}
+  .hero-content{position:relative;z-index:3;text-align:center;padding:2rem 0 5rem;max-width:900px}
+  .hero h1{
+    font-family:var(--display);font-weight:700;
+    font-size:clamp(3rem,9.5vw,7.2rem);line-height:.94;letter-spacing:-.045em;margin:0;
+    color:var(--gold);
+    text-shadow:0 1px 0 #7a5c17,0 2px 0 #5a4212,0 3px 1px #3a2a0c,0 12px 38px rgba(0,0,0,.95);
+  }
+  .hero h1 span{display:block;font-size:.42em;letter-spacing:.02em;color:var(--ink);font-weight:400;text-shadow:0 4px 22px rgba(0,0,0,.9);margin-top:.35rem}
+  .hero .lede{
+    color:var(--mist);max-width:50ch;margin:1.8rem auto 2.2rem;font-size:clamp(1rem,1.5vw,1.2rem);
+  }
+  .hero .lede strong{color:var(--ink);font-weight:600}
+  .btn-gold{
+    display:inline-flex;align-items:center;gap:.75rem;
+    background:linear-gradient(180deg,#e3c25c,#c59b2f);color:#1a1407;
+    border:1px solid #f0d98a;padding:1rem 2.2rem;
+    font-size:.78rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
+    box-shadow:0 14px 36px -14px rgba(212,175,55,.65),inset 0 1px 0 rgba(255,255,255,.4);
+    transition:transform .4s var(--ease),box-shadow .4s var(--ease);
+    clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+  }
+  .btn-gold:hover{transform:translateY(-3px);box-shadow:0 22px 44px -14px rgba(212,175,55,.75),inset 0 1px 0 rgba(255,255,255,.5)}
+  .scroll-cue{
+    position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:4;
+    font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--mist);
+    display:grid;gap:.7rem;justify-items:center;
+  }
+  .scroll-cue i{width:1px;height:44px;background:linear-gradient(var(--gold),transparent);animation:cue 2.2s var(--ease) infinite}
+  @keyframes cue{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 
-    .gallery{
-      display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(1.2rem,3vw,2.4rem);align-items:start;
-    }
-    .gallery .work:nth-child(1){grid-column:span 7}
-    .gallery .work:nth-child(2){grid-column:span 5}
-    .gallery .work:nth-child(3){grid-column:span 5}
-    .gallery .work:nth-child(4){grid-column:span 7}
-    .gallery .work:nth-child(5){grid-column:span 4}
-    .gallery .work:nth-child(6){grid-column:span 4}
-    .gallery .work:nth-child(7){grid-column:span 4}
-    .gallery .work:nth-child(8){grid-column:span 8}
-    .gallery .work:nth-child(9){grid-column:span 4}
-    .gallery .frame{aspect-ratio:16/9}
-    .gallery .work:nth-child(2) .frame,.gallery .work:nth-child(3) .frame,.gallery .work:nth-child(9) .frame{aspect-ratio:4/5}
+  /* ── sections ─────────────────────────────────────────────────────── */
+  .section{position:relative;padding:clamp(5rem,11vw,9rem) 0;border-top:1px solid var(--line-soft)}
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin-bottom:clamp(2.5rem,6vw,4.5rem)}
+  .sec-head h2{
+    font-family:var(--display);font-weight:400;letter-spacing:-.035em;line-height:1.05;
+    font-size:clamp(2.2rem,5.4vw,4rem);margin:0;
+  }
+  .sec-head h2 em{font-style:normal;color:var(--gold)}
+  .sec-head .aside{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--mist);text-align:right;max-width:24ch}
 
-    .contact-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(2rem,5vw,4rem)}
-    .contact-grid p{color:var(--muted);max-width:40ch}
-    .email{color:var(--brass);text-decoration:none;border-bottom:1px solid currentColor}
-    form{display:grid;gap:1.2rem}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
-    label{display:grid;gap:.45rem;font-size:.82rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
-    input,select,textarea{
-      font:inherit;text-transform:none;letter-spacing:normal;color:var(--ink);
-      background:var(--wall-2);border:1px solid var(--line);border-radius:2px;padding:.8rem .9rem;
-      transition:border-color .25s var(--ease);
-    }
-    input:hover,select:hover,textarea:hover,input:focus,select:focus,textarea:focus{border-color:var(--brass)}
-    textarea{min-height:150px;resize:vertical}
-    .note{min-height:1.4rem;color:var(--brass);font-size:.9rem}
-    footer{padding:2.4rem 0 3.5rem;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-    footer a{color:var(--brass);text-decoration:none}
+  /* about */
+  .about-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);gap:clamp(2rem,6vw,5rem);align-items:start}
+  .prose{font-size:clamp(1.05rem,1.6vw,1.28rem);color:var(--muted);max-width:62ch}
+  .prose strong{color:var(--ink);font-weight:650}
+  .sigil{
+    position:relative;border:1px solid var(--line);padding:2rem;background:linear-gradient(145deg,rgba(212,175,55,.06),transparent 60%);
+    clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);
+  }
+  .sigil::before,.sigil::after{content:"";position:absolute;width:16px;height:16px;border-color:var(--gold)}
+  .sigil::before{top:8px;left:8px;border-top:1px solid;border-left:1px solid}
+  .sigil::after{bottom:8px;right:8px;border-bottom:1px solid;border-right:1px solid}
+  .sigil .big{font-family:var(--display);font-size:clamp(2.6rem,5vw,4rem);color:var(--gold);line-height:1;letter-spacing:-.04em}
+  .sigil p{margin:.6rem 0 0;color:var(--muted);font-size:.9rem}
+  .stack{list-style:none;padding:0;margin:2.2rem 0 0;display:flex;flex-wrap:wrap;gap:.6rem}
+  .stack li{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line-soft);padding:.45rem .8rem;transition:border-color .3s,color .3s}
+  .stack li:hover{border-color:var(--gold);color:var(--gold)}
 
-    @media (max-width:900px){
-      .hero,.contact-grid{grid-template-columns:1fr}
-      .hero{padding-top:3rem}
-      .gallery{grid-template-columns:1fr}
-      .gallery .work{grid-column:1/-1!important}
-      .gallery .frame,.gallery .work:nth-child(2) .frame,.gallery .work:nth-child(3) .frame,.gallery .work:nth-child(9) .frame{aspect-ratio:16/10}
-    }
-    @media (max-width:560px){
-      .row{grid-template-columns:1fr}
-      nav{gap:.8rem}
-      .brand{width:100%}
-      .topbar{flex-wrap:wrap}
-      .hero h1{font-size:clamp(2.2rem,11vw,3.2rem)}
-    }
-    @media (prefers-reduced-motion:reduce){
-      html{scroll-behavior:auto}
-      *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
-    }
-  </style>
+  /* works */
+  .works{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(1.4rem,3vw,2.6rem);align-items:start}
+  .artifact{grid-column:span 6;position:relative}
+  .artifact:nth-child(4n+1),.artifact:nth-child(4n+4){grid-column:span 7}
+  .artifact:nth-child(4n+2),.artifact:nth-child(4n+3){grid-column:span 5}
+  .plate{
+    position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line-soft);
+    clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px);
+    box-shadow:var(--shadow);
+  }
+  .plate::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(115deg,transparent 35%,rgba(212,175,55,.18) 50%,transparent 65%);
+    transform:translateX(-120%);transition:transform .9s var(--ease);
+  }
+  .artifact:hover .plate::after{transform:translateX(120%)}
+  .plate img{width:100%;aspect-ratio:16/10;object-fit:cover;opacity:.92;transition:transform .9s var(--ease),opacity .6s}
+  .artifact:hover .plate img{transform:scale(1.045);opacity:1}
+  .artifact .num{
+    position:absolute;top:1rem;left:1rem;z-index:2;font-family:var(--display);font-size:.8rem;color:var(--gold);
+    border:1px solid var(--line);background:rgba(10,13,20,.7);padding:.2rem .55rem;letter-spacing:.1em;
+  }
+  .plaque{padding-top:1.1rem;display:grid;gap:.35rem}
+  .plaque .kicker{font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan)}
+  .plaque h3{font-family:var(--display);font-weight:400;font-size:clamp(1.3rem,2.4vw,1.9rem);margin:0;letter-spacing:-.025em}
+  .plaque p{margin:0;color:var(--muted);font-size:.92rem;max-width:54ch}
+
+  /* contact */
+  .contact-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(2rem,6vw,5rem)}
+  .portal{
+    position:relative;border:1px solid var(--line);padding:clamp(1.5rem,3vw,2.4rem);
+    background:radial-gradient(ellipse at 20% 0%,rgba(212,175,55,.1),transparent 60%),var(--void-2);
+    clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px);
+  }
+  .portal h3{font-family:var(--display);font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:400;margin:0 0 .6rem;letter-spacing:-.03em}
+  .portal p{color:var(--muted);max-width:42ch}
+  .email{color:var(--gold);border-bottom:1px solid var(--gold-deep);display:inline-block;margin-top:1rem}
+  form{display:grid;gap:1.2rem}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+  label{display:grid;gap:.5rem;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--mist)}
+  input,select,textarea{
+    font:inherit;text-transform:none;letter-spacing:normal;color:var(--ink);
+    background:var(--void);border:1px solid var(--line-soft);padding:.85rem .9rem;
+    transition:border-color .3s var(--ease),box-shadow .3s var(--ease);
+  }
+  input:hover,select:hover,textarea:hover,input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.08);outline:none}
+  textarea{min-height:140px;resize:vertical}
+  .note{min-height:1.4rem;color:var(--gold);font-size:.85rem}
+  footer{padding:2.5rem 0 3.5rem;border-top:1px solid var(--line-soft);color:var(--mist);font-size:.8rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;letter-spacing:.06em}
+  footer a{color:var(--gold)}
+
+  /* ── reveal motion ────────────────────────────────────────────────── */
+  .reveal{opacity:0;transform:translate3d(0,34px,0);filter:blur(6px);transition:opacity 1s var(--ease),transform 1s var(--ease),filter 1s var(--ease)}
+  .reveal.in{opacity:1;transform:none;filter:none}
+  .hero h1,.hero .lede,.hero .btn-gold{opacity:0;transform:translate3d(0,26px,0);filter:blur(8px)}
+  body.ready .hero h1{animation:rise 1.2s var(--ease) .25s forwards}
+  body.ready .hero .lede{animation:rise 1.1s var(--ease) .55s forwards}
+  body.ready .hero .btn-gold{animation:rise 1s var(--ease) .85s forwards}
+  @keyframes rise{to{opacity:1;transform:none;filter:none}}
+
+  @media (max-width:900px){
+    .about-grid,.contact-grid{grid-template-columns:1fr}
+    .works{grid-template-columns:1fr}
+    .artifact,.artifact:nth-child(n){grid-column:1/-1}
+    .sec-head{flex-direction:column;align-items:flex-start}
+    .sec-head .aside{text-align:left}
+    .figures{opacity:.5}
+  }
+  @media (max-width:560px){
+    .topbar .wrap{height:58px}
+    nav{gap:1rem}
+    nav a:not(.nav-cta){display:none}
+    .hero h1{font-size:clamp(2rem,9.6vw,3.2rem);letter-spacing:-.05em}
+    .hero h1 span{font-size:.46em}
+    .row{grid-template-columns:1fr}
+    .plate img{aspect-ratio:4/3}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+    .reveal,.hero h1,.hero .lede,.hero .btn-gold{opacity:1!important;transform:none!important;filter:none!important}
+  }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="topbar">
-      <a class="brand" href="#top">dev-<span>Jefferson</span></a>
-      <nav aria-label="Seções">
-        <a href="#sobre">Sobre</a>
-        <a href="#trabalhos">Trabalhos</a>
-        <a href="#contato">Contato</a>
-      </nav>
-    </header>
 
-    <main id="top">
-      <section class="hero" aria-labelledby="titulo">
-        <div>
-          <h1 id="titulo">Código que resolve <em>negócio</em>.</h1>
-          <p>Sou Jefferson Macedo Fernandes, desenvolvedor full-stack em Matozinhos, MG. Construo sistemas SaaS, aplicativos de fidelização e automações — do backend à interface que a pessoa usa.</p>
-          <div class="actions">
-            <a class="cta" href="mailto:jefferson.macedo.fernandes@gmail.com?subject=Agendar%20reuni%C3%A3o">Agendar reunião</a>
-            <a class="quiet" href="#trabalhos">Ver trabalhos</a>
-          </div>
-        </div>
-        <figure class="work work--feature">
-          <div class="frame frame--icon">
-            <img src="nexo-icon.png" alt="Ícone do aplicativo Nexo, um mascote azul" width="420" height="420">
-          </div>
-          <figcaption class="plaque">
-            <span class="tags">Assistente Android · voz própria · automação</span>
-            <h2>Nexo</h2>
-            <p>Assistente pessoal que fala e executa pedidos no celular: WhatsApp, música em segundo plano, lembretes e aprendizado local.</p>
-            <a href="https://github.com/Dev-JeffersonMF/nexo-app" target="_blank" rel="noopener">Nexo</a>
-          </figcaption>
-        </figure>
-      </section>
-
-      <section class="section" id="sobre" aria-labelledby="sobre-titulo">
-        <h2 id="sobre-titulo">Como trabalho</h2>
-        <p class="prose">Entendo o problema antes de escrever a primeira linha. Cada projeto é tratado como se fosse o meu próprio negócio: modelo de dados sólido, interface clara e entrega que a equipe consegue usar no dia seguinte. A diferença está em unir visão de negócio e execução técnica.</p>
-        <ul class="stack" aria-label="Tecnologias que domino">
-          <li>React</li><li>Node.js</li><li>Firebase</li><li>React Native</li>
-          <li>PostgreSQL</li><li>JavaScript</li><li>TypeScript</li><li>CSS</li>
-          <li>Git/GitHub</li><li>Docker</li><li>REST API</li><li>AI/Claude</li>
-        </ul>
-      </section>
-
-      <section class="section" id="trabalhos" aria-labelledby="trabalhos-titulo">
-        <h2 id="trabalhos-titulo">Trabalhos entregues</h2>
-        <div class="gallery">
-          <figure class="work">
-            <div class="frame"><img src="img/bighouse.png" alt="Tela do sistema Big House" loading="lazy"></div>
-            <figcaption class="plaque"><span class="tags">SaaS · Rota Lucrativas</span><h3>Big House</h3><p>Ecossistema completo de gestão de rota otimizadas com login seguro, portal de equipe e painel de controle em tempo real.</p><a href="https://github.com/Dev-JeffersonMF" target="_blank" rel="noopener">GitHub</a></figcaption>
-          </figure>
-          <figure class="work">
-            <div class="frame"><img src="img/taximento.jpeg" alt="Tela do Taxímetro Pro" loading="lazy"></div>
-            <figcaption class="plaque"><span class="tags">App · Financeiro · Motoristas</span><h3>Taxímetro Pro</h3><p>Análise financeira em tempo real para motoristas, com otimização de lucro, controle de km/L e relatórios detalhados.</p><a href="https://github.com/Dev-JeffersonMF" target="_blank" rel="noopener">GitHub</a></figcaption>
-          </figure>
-          <figure class="work">
-            <div class="frame"><img src="img/rede fliper.png" alt="Tela da Rede Fliper" loading="lazy"></div>
-            <figcaption class="plaque"><span class="tags">Fidelização · QR Code · Gamificação</span><h3>Rede Fliper</h3><p>Fidelização inteligente com gamificação, leitura de QR Code no caixa e resgate de prêmios integrado.</p><a href="https://github.com/Dev-JeffersonMF" target="_blank" rel="noopener">GitHub</a></figcaption>
-          </figure>
-          <figure class="work">
-            <div class="frame"><img src="img/jl.png" alt="Loja JL Construção" loading="lazy"></div>
-            <figcaption class="plaque"><span class="tags">E-commerce · Varejo · Entregas</span><h3>JL Construção</h3><p>Catálogo integrado com gestão de carrinho, checkout e controle de entregas locais.</p><a href="https://github.com/Dev-JeffersonMF" target="_blank" rel="noopener">GitHub</a></figcaption>
-          </figure>
-          <figure class="work">
-            <div class="frame"><img src="img/pediuchegou.png" alt="Tela do PediChegou" loading="lazy"></div>
-            <figcaption class="plaque"><span class="tags">Farmácia · WhatsApp · Receituário</span><h3>PediChegou</h3><p>Envio de receituário fotográfico e fechamento de pedidos via WhatsApp para farmácias.</p><a href="https://github.com/Dev-JeffersonMF" target="_blank" rel="noopener">GitHub</a></figcaption>
-          </figure>
-          <figure class="work">
-            <div class="frame"><img src="img/parafusooliveira.png" alt="Sistema Parafuso Oliveira" loading="lazy"></div>
-            <figcaption class="plaque"><span class="tags">Pontuação · Corporativo · NF</span><h3>Parafuso Oliveira</h3><p>Acúmulo de pontos corporativos integrado ao portal web e à nota fiscal para fidelização B2B.</p><a href="https://github.com/Dev-JeffersonMF" target="_blank" rel="noopener">GitHub</a></figcaption>
-          </figure>
-          <figure class="work">
-            <div class="frame"><img src="img/deia site.png" alt="Loja Deia Presentes" loading="lazy"></div>
-            <figcaption class="plaque"><span class="tags">Cosméticos · E-commerce · Checkout</span><h3>Deia Presentes</h3><p>Interface premium para pedidos de cosméticos com painel de gestão e checkout rápido integrado.</p><a href="https://github.com/Dev-JeffersonMF" target="_blank" rel="noopener">GitHub</a></figcaption>
-          </figure>
-          <figure class="work">
-            <div class="frame"><img src="img/Peixoto.png" alt="Plataforma Peixoto Soluções Elétricas" loading="lazy"></div>
-            <figcaption class="plaque"><span class="tags">Soluções Elétricas · Automação Industrial</span><h3>Peixoto Soluções Elétricas</h3><p>Gestão de projetos elétricos, orçamentos, agendamento de serviços e estoque de materiais com relatórios em tempo real.</p><a href="https://github.com/Dev-JeffersonMF" target="_blank" rel="noopener">GitHub</a></figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <section class="section" id="contato" aria-labelledby="contato-titulo">
-        <div class="contact-grid">
-          <div>
-            <h2 id="contato-titulo">Vamos conversar</h2>
-            <p>Disponível para discutir seu projeto, esclarecer dúvidas e apresentar uma proposta. Escreva por aqui ou me chame direto no email.</p>
-            <a class="email" href="mailto:jefferson.macedo.fernandes@gmail.com">jefferson.macedo.fernandes@gmail.com</a>
-          </div>
-          <form id="contato-form">
-            <div class="row">
-              <label>Nome<input name="nome" id="c-name" required autocomplete="name"></label>
-              <label>Email<input name="email" id="c-email" type="email" required autocomplete="email"></label>
-            </div>
-            <label>Assunto
-              <select name="assunto" id="c-subject">
-                <option>Desenvolvimento de Sistema</option>
-                <option>App Mobile</option>
-                <option>E-commerce</option>
-                <option>Automação</option>
-                <option>Consultoria</option>
-                <option>Outro</option>
-              </select>
-            </label>
-            <label>Mensagem<textarea name="mensagem" id="c-msg" required></textarea></label>
-            <button class="cta" type="submit">Enviar mensagem</button>
-            <p class="note" id="form-note" role="status" aria-live="polite"></p>
-          </form>
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      <span>dev-Jefferson · Matozinhos, MG</span>
-      <span><a href="https://github.com/Dev-JeffersonMF" target="_blank" rel="noopener">GitHub</a> · <a href="mailto:jefferson.macedo.fernandes@gmail.com">Email</a></span>
-    </footer>
+<div id="loader" aria-hidden="true">
+  <div class="loader-inner">
+    <div class="loader-mark">dev-Jefferson</div>
+    <div class="loader-bar"><i></i></div>
+    <div class="loader-sub">Abrindo o portal</div>
   </div>
+</div>
 
-  <script>
-    (function(){
-      const works = document.querySelectorAll('.work');
-      if ('IntersectionObserver' in window) {
-        const obs = new IntersectionObserver((entries)=>{
-          entries.forEach((e)=>{
-            if (e.isIntersecting) { e.target.classList.add('lit'); obs.unobserve(e.target); }
-          });
-        },{threshold:.18});
-        works.forEach((w)=>obs.observe(w));
-      } else {
-        works.forEach((w)=>w.classList.add('lit'));
-      }
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top"><b>dev-</b>Jefferson</a>
+    <nav aria-label="Seções">
+      <a href="#sobre">Sobre</a>
+      <a href="#trabalhos">Trabalhos</a>
+      <a href="#contato">Contato</a>
+      <a class="nav-cta" href="mailto:jefferson.macedo.fernandes@gmail.com?subject=Agendar%20reuni%C3%A3o">Agendar reunião</a>
+    </nav>
+  </div>
+</header>
 
-      const form = document.getElementById('contato-form');
-      const note = document.getElementById('form-note');
-      form.addEventListener('submit', function(ev){
-        ev.preventDefault();
-        const nome = document.getElementById('c-name').value.trim();
-        const email = document.getElementById('c-email').value.trim();
-        const assunto = document.getElementById('c-subject').value;
-        const msg = document.getElementById('c-msg').value.trim();
-        if (!nome || !email || !msg) { note.textContent = 'Preencha nome, email e mensagem.'; return; }
-        const body = 'Nome: ' + nome + '%0AEmail: ' + email + '%0A%0AMensagem:%0A' + encodeURIComponent(msg);
-        const url = 'mailto:jefferson.macedo.fernandes@gmail.com?subject=' + encodeURIComponent('Contato via Portfólio - ' + assunto) + '&body=' + body;
-        window.location.href = url;
-        note.textContent = 'Seu aplicativo de email foi aberto.';
+<main id="top">
+  <section class="hero" aria-labelledby="titulo">
+    <div class="scene" aria-hidden="true">
+      <div class="layer sky" data-speed="0.06"></div>
+      <div class="layer mist" data-speed="0.12"></div>
+      <div class="layer ridge ridge--far" data-speed="0.18">
+        <svg viewBox="0 0 1440 520" preserveAspectRatio="none" width="100%" height="100%"><path d="M0 380 L120 320 L240 360 L380 250 L520 330 L660 210 L820 300 L980 230 L1140 320 L1300 260 L1440 340 L1440 520 L0 520Z"/></svg>
+      </div>
+      <div class="layer ridge" data-speed="0.3">
+        <svg viewBox="0 0 1440 420" preserveAspectRatio="none" width="100%" height="100%"><path d="M0 300 L160 250 L300 310 L460 220 L620 300 L780 200 L940 290 L1100 230 L1280 310 L1440 250 L1440 420 L0 420Z"/></svg>
+      </div>
+      <div class="layer figures" data-speed="0.42">
+        <svg class="fig-left" viewBox="0 0 300 700" preserveAspectRatio="xMinYMax meet"><path d="M40 700 L52 470 L30 430 L58 405 L70 330 L110 300 L150 312 L176 290 L206 330 L214 410 L246 440 L232 700Z"/></svg>
+        <svg class="fig-right" viewBox="0 0 300 700" preserveAspectRatio="xMinYMax meet"><path d="M40 700 L52 470 L30 430 L58 405 L70 330 L110 300 L150 312 L176 290 L206 330 L214 410 L246 440 L232 700Z"/></svg>
+      </div>
+      <div class="motes" id="motes"></div>
+      <div class="grain"></div>
+      <div class="vignette"></div>
+    </div>
+
+    <div class="hero-content">
+      <h1 id="titulo">DEV-JEFFERSON<span>sistemas que resolvem negócio</span></h1>
+      <p class="lede">Sou <strong>Jefferson Macedo Fernandes</strong>, desenvolvedor full-stack em Matozinhos, MG. Construo sistemas SaaS, aplicativos de fidelização e automações — do backend à interface que a pessoa usa.</p>
+      <a class="btn-gold" href="#trabalhos">Ver trabalhos</a>
+    </div>
+
+    <div class="scroll-cue" aria-hidden="true"><span>Rolar</span><i></i></div>
+  </section>
+
+  <section class="section" id="sobre" aria-labelledby="sobre-titulo">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2 id="sobre-titulo">Como <em>trabalho</em></h2>
+        <div class="aside">Matozinhos · MG<br>full-stack · desde 2020</div>
+      </div>
+      <div class="about-grid">
+        <div class="reveal">
+          <p class="prose">Entendo o problema antes de escrever a primeira linha. Cada projeto é tratado como se fosse o meu próprio negócio: modelo de dados sólido, interface clara e entrega que a equipe consegue usar no dia seguinte. A diferença está em unir <strong>visão de negócio</strong> e <strong>execução técnica</strong>.</p>
+          <ul class="stack" aria-label="Tecnologias que domino">
+            <li>React</li><li>Node.js</li><li>Firebase</li><li>React Native</li>
+            <li>PostgreSQL</li><li>JavaScript</li><li>TypeScript</li><li>CSS</li>
+            <li>Git/GitHub</li><li>Docker</li><li>REST API</li><li>AI/Claude</li>
+          </ul>
+        </div>
+        <aside class="sigil reveal">
+          <div class="big">12+</div>
+          <p>sistemas entregues para negócios reais — do PDV à automação industrial, passando por fidelização e apps próprios.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="trabalhos" aria-labelledby="trabalhos-titulo">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2 id="trabalhos-titulo">Trabalhos <em>entregues</em></h2>
+        <div class="aside">Cada projeto é uma<br>missão concluída</div>
+      </div>
+      <div class="works">
+        <article class="artifact reveal">
+          <div class="plate"><span class="num">01</span><img src="img/bighouse.png" alt="Tela do sistema Big House" loading="lazy"></div>
+          <div class="plaque"><span class="kicker">SaaS · Logística</span><h3>Big House</h3><p>Ecossistema de gestão de rotas otimizadas com login seguro, portal de equipe e painel em tempo real.</p></div>
+        </article>
+        <article class="artifact reveal">
+          <div class="plate"><span class="num">02</span><img src="img/taximento.jpeg" alt="Tela do Taxímetro Pro" loading="lazy"></div>
+          <div class="plaque"><span class="kicker">App · Financeiro</span><h3>Taxímetro Pro</h3><p>Análise financeira em tempo real para motoristas, com controle de km/L e relatórios detalhados.</p></div>
+        </article>
+        <article class="artifact reveal">
+          <div class="plate"><span class="num">03</span><img src="img/rede fliper.png" alt="Tela da Rede Fliper" loading="lazy"></div>
+          <div class="plaque"><span class="kicker">Fidelização · QR Code</span><h3>Rede Fliper</h3><p>Fidelização com gamificação, leitura de QR Code no caixa e resgate de prêmios integrado.</p></div>
+        </article>
+        <article class="artifact reveal">
+          <div class="plate"><span class="num">04</span><img src="img/jl.png" alt="Loja JL Construção" loading="lazy"></div>
+          <div class="plaque"><span class="kicker">E-commerce · Varejo</span><h3>JL Construção</h3><p>Catálogo integrado com carrinho, checkout e controle de entregas locais.</p></div>
+        </article>
+        <article class="artifact reveal">
+          <div class="plate"><span class="num">05</span><img src="img/pediuchegou.png" alt="Tela do PediChegou" loading="lazy"></div>
+          <div class="plaque"><span class="kicker">Farmácia · WhatsApp</span><h3>PediChegou</h3><p>Envio de receituário fotográfico e fechamento de pedidos via WhatsApp para farmácias.</p></div>
+        </article>
+        <article class="artifact reveal">
+          <div class="plate"><span class="num">06</span><img src="img/parafusooliveira.png" alt="Sistema Parafuso Oliveira" loading="lazy"></div>
+          <div class="plaque"><span class="kicker">Corporativo · NF</span><h3>Parafuso Oliveira</h3><p>Acúmulo de pontos corporativos integrado ao portal web e à nota fiscal.</p></div>
+        </article>
+        <article class="artifact reveal">
+          <div class="plate"><span class="num">07</span><img src="img/deia site.png" alt="Loja Deia Presentes" loading="lazy"></div>
+          <div class="plaque"><span class="kicker">Cosméticos · Checkout</span><h3>Deia Presentes</h3><p>Interface premium para pedidos de cosméticos com painel de gestão e checkout rápido.</p></div>
+        </article>
+        <article class="artifact reveal">
+          <div class="plate"><span class="num">08</span><img src="img/Peixoto.png" alt="Plataforma Peixoto Soluções Elétricas" loading="lazy"></div>
+          <div class="plaque"><span class="kicker">Indústria · Automação</span><h3>Peixoto Soluções Elétricas</h3><p>Gestão de projetos elétricos, orçamentos, agendamento e estoque com relatórios em tempo real.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contato" aria-labelledby="contato-titulo">
+    <div class="wrap contact-grid">
+      <div class="portal reveal">
+        <h3 id="contato-titulo">Vamos conversar</h3>
+        <p>Disponível para discutir seu projeto, esclarecer dúvidas e apresentar uma proposta. Escreva por aqui ou me chame direto no email.</p>
+        <a class="email" href="mailto:jefferson.macedo.fernandes@gmail.com">jefferson.macedo.fernandes@gmail.com</a>
+      </div>
+      <form id="contato-form" class="reveal">
+        <div class="row">
+          <label>Nome<input name="nome" id="c-name" required autocomplete="name"></label>
+          <label>Email<input name="email" id="c-email" type="email" required autocomplete="email"></label>
+        </div>
+        <label>Assunto
+          <select name="assunto" id="c-subject">
+            <option>Desenvolvimento de Sistema</option><option>App Mobile</option>
+            <option>E-commerce</option><option>Automação</option><option>Consultoria</option><option>Outro</option>
+          </select>
+        </label>
+        <label>Mensagem<textarea name="mensagem" id="c-msg" required></textarea></label>
+        <button class="btn-gold" type="submit">Enviar mensagem</button>
+        <p class="note" id="form-note" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>dev-Jefferson · Matozinhos, MG</span>
+  <span><a href="https://github.com/Dev-JeffersonMF" target="_blank" rel="noopener">GitHub</a> · <a href="mailto:jefferson.macedo.fernandes@gmail.com">Email</a></span>
+</footer>
+
+<script>
+(function(){
+  // loader
+  const loader=document.getElementById('loader');
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      loader.classList.add('done');
+      document.body.classList.add('ready');
+    },1450);
+  });
+
+  // motes
+  const motes=document.getElementById('motes');
+  for(let i=0;i<26;i++){
+    const s=document.createElement('span');
+    s.className='mote';
+    s.style.left=(Math.random()*100)+'%';
+    s.style.top=(Math.random()*100)+'%';
+    s.style.animationDelay=(Math.random()*8)+'s';
+    s.style.animationDuration=(7+Math.random()*6)+'s';
+    motes.appendChild(s);
+  }
+
+  // reveals
+  const reveals=document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    const obs=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});
+    },{threshold:.14,rootMargin:'0px 0px -8% 0px'});
+    reveals.forEach(function(el){obs.observe(el);});
+  }else{reveals.forEach(function(el){el.classList.add('in');});}
+
+  // parallax
+  const layers=document.querySelectorAll('.layer[data-speed]');
+  let ticking=false;
+  function onScroll(){
+    if(ticking)return;
+    ticking=true;
+    requestAnimationFrame(function(){
+      const y=window.scrollY;
+      layers.forEach(function(l){
+        const s=parseFloat(l.dataset.speed);
+        l.style.transform='translate3d(0,'+(y*s)+'px,0)';
       });
-    })();
-  </script>
+      ticking=false;
+    });
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+
+  // form
+  const form=document.getElementById('contato-form');
+  const note=document.getElementById('form-note');
+  form.addEventListener('submit',function(ev){
+    ev.preventDefault();
+    const nome=document.getElementById('c-name').value.trim();
+    const email=document.getElementById('c-email').value.trim();
+    const assunto=document.getElementById('c-subject').value;
+    const msg=document.getElementById('c-msg').value.trim();
+    if(!nome||!email||!msg){note.textContent='Preencha nome, email e mensagem.';return;}
+    const body='Nome: '+nome+'%0AEmail: '+email+'%0A%0AMensagem:%0A'+encodeURIComponent(msg);
+    const url='mailto:jefferson.macedo.fernandes@gmail.com?subject='+encodeURIComponent('Contato via Portfólio - '+assunto)+'&body='+body;
+    window.location.href=url;
+    note.textContent='Seu aplicativo de email foi aberto.';
+  });
+})();
+</script>
 </body>
 </html>
